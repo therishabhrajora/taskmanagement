@@ -1,5 +1,6 @@
 package com.taskmanagerment.taskmanagement.security;
 
+import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -14,32 +15,44 @@ import com.taskmanagerment.taskmanagement.enums.Role;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JWTTokenUtil {
-    private final String jwtSecret = "JWTTOKEN";
+    private final String jwtSecret = "mysupersecretkeymysupersecretkey123456";
     private final long expireJWT = 8400000;
 
+    Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
     public String generateToken(UserAuthentication user) {
-        // List<String> authorities = roles.stream().map(role -> "ROLE" + role.name()).collect(Collectors.toList());
+        // List<String> authorities = roles.stream().map(role -> "ROLE" +
+        // role.name()).collect(Collectors.toList());
+
         return Jwts.builder()
                 .setSubject(user.getUsername())
-               // .claim("roles", authorities)
+                // .claim("roles", authorities)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expireJWT))
-                .signWith(SignatureAlgorithm.ES512, jwtSecret)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
     }
 
-
-    public String extractUsername(String token){
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    public boolean validatetoken(String token){
+    public boolean validatetoken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
 
         } catch (JwtException e) {
@@ -47,8 +60,4 @@ public class JWTTokenUtil {
         }
     }
 
-    // public String generateToken(UserAuthentication user) {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'generateToken'");
-    // }
 }

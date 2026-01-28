@@ -1,9 +1,6 @@
 package com.taskmanagerment.taskmanagement.security;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,8 +28,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable().authorizeRequests(auth -> auth
-                .requestMatchers("/api/auth").permitAll().anyRequest().authenticated()).build();
+        return http.csrf(csrf -> csrf.disable()).authorizeRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated()).build();
     }
 
 }
