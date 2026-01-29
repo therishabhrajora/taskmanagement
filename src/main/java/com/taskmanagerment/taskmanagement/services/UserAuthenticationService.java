@@ -52,14 +52,18 @@ public class UserAuthenticationService {
     }
 
     public AuthResponseDTO login(LoginRequestDTO login) {
+       
         UserAuthentication user = userAuthRepo.findByUserOfficialEmail(login.getUserOfficialEmail())
                 .orElseThrow(()->new RuntimeException("User not found"));
+
+        System.out.println(user.getPassword());
 
         if(!passwordEncoder.matches(login.getPassword(), user.getPassword())){
             throw new RuntimeException("Invalid credentials");
         }
 
         String token=jUtil.generateToken(user);
+        System.out.println("this is token"+token);
         return new AuthResponseDTO(token,"token got generated");
     } 
 

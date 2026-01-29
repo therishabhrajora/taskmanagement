@@ -27,7 +27,6 @@ public class UserAuthenticateController {
         System.out.println("this is =================="+request);
       
         userAuthenticationService.register(request);
-
         return ResponseEntity.ok("User register successfully");
     }
 

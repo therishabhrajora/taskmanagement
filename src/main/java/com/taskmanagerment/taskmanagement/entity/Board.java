@@ -1,20 +1,21 @@
 package com.taskmanagerment.taskmanagement.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.taskmanagerment.taskmanagement.enums.BoardType;
 
-import com.taskmanagerment.taskmanagement.enums.Role;
-
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,27 +24,29 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name="user_auth")
-@AllArgsConstructor
+@Table(name="boards")
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class UserAuthentication {
+public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-     private String username;
-    @Column(unique = true,nullable = false)
-    private String userOfficialEmail;
-    @Column(nullable = false)
-    private String password;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
 
-    private boolean actice=true;
+    private String name;
+    private String projectKey;
+
+    @Enumerated(EnumType.STRING)
+    private BoardType boardType;
+    
     private LocalDateTime createdAt=LocalDateTime.now();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OrderBy("position")
+    private List<BoardColumn> columns=new ArrayList<>();
     
+    
+
+
 
 }
