@@ -1,5 +1,7 @@
 package com.taskmanagerment.taskmanagement.entity;
 
+import java.time.LocalDateTime;
+
 import com.taskmanagerment.taskmanagement.enums.SprintState;
 
 import jakarta.persistence.Column;
@@ -16,10 +18,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "sprints")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class Sprint {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -28,9 +30,14 @@ public class Sprint {
     @Column(nullable = false)
     private String sprintName;
 
-    private String startDate;
-    private String endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
     private SprintState state;
+
+    private Long projectId;
+    private LocalDateTime createdAt=LocalDateTime.now();
+    
+
 }
