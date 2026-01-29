@@ -24,7 +24,7 @@ public class UserAuthenticateController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequestDTO request){
-        System.out.println("this is =================="+request);
+        System.out.println("this is     ===="+request);
       
         userAuthenticationService.register(request);
         return ResponseEntity.ok("User register successfully");
