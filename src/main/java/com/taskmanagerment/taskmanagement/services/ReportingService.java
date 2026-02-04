@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.netflix.discovery.converters.Auto;
 import com.taskmanagerment.taskmanagement.entity.Issue;
 import com.taskmanagerment.taskmanagement.entity.Sprint;
+import com.taskmanagerment.taskmanagement.enums.IssueStatus;
+import com.taskmanagerment.taskmanagement.enums.SprintState;
 import com.taskmanagerment.taskmanagement.repositpory.IssueRepo;
 import com.taskmanagerment.taskmanagement.repositpory.SprintRepo;
 
@@ -52,6 +55,88 @@ public class ReportingService {
         return response;
 
     }
+
+    public Map<String,Object>  velocity(Long projectId){
+        List<Sprint> completeSprints=sprintRepo.findByProjectId(projectId)
+                .stream()
+                .filter(sprint -> sprint.getState()==SprintState.COMPLETED).collect(Collectors.toList());
+
+
+
+                Map<String,Integer>  velocity=new LinkedHashMap<>();
+                for(Sprint sprint:completeSprints){
+                    int doneIssues=(int) issueRepo.findBySprintId(sprint.getId()).stream().filter(i->i.getIssueStatus()==IssueStatus.DONE).count();
+                    velocity.put(sprint.getSprintName(), doneIssues);
+                }
+
+                Map<String,Object> response=new HashMap<>();
+                response.put("projectId", projectId);
+                response.put("velocity", velocity);
+
+
+                return response;
+
+    }
+
+
+    public Map<String,Object>  sprintReport(Long springId){
+        List<Issue> issues=issueRepo.findBySprintId(springId);
+
+        long completed=issues.stream().filter(i->i.getIssueStatus()==IssueStatus.DONE).count();
+
+        Map<String,Object> response=new HashMap<>();
+        response.put("totalIssues", issues.size());
+        response.put("completed", completed);
+        response.put("incomplete", issues.size()-completed);
+
+        return response;
+
+    }
+    public Map<String,Object>  epicReport(Long epicId){
+        List<Issue> stories=issueRepo.findByEpicId(epicId);
+
+        long completed=stories.stream().filter(i->i.getIssueStatus()==IssueStatus.DONE).count();
+
+        int progress=stories.isEmpty() ?0:(int) (completed*100/stories.size());
+
+        Map<String,Object> response=new HashMap<>();
+        response.put("epicId", epicId);
+        response.put("totalIssues", stories.size());
+        response.put("completed", completed);
+        response.put("progressPercentage", progress);
+
+        return response;
+
+    }
+    public Map<String,Object>  workLoad(Long sprintId){
+        List<Issue> issues=issueRepo.findBySprintId(sprintId);
+        Map<String, Long> workload = issues.stream().collect(Collectors.groupingBy(Issue::getAssigneeEmail,Collectors.counting()));
+
+        Map<String,Object> response=new HashMap<>();
+        
+        response.put("workLoad", workload);
+
+        return response;
+
+    }
+    public Map<String,Object>  comulativeFlow(Long sprintId){
+        List<Issue> issues=issueRepo.findBySprintId(sprintId);
+        Map<IssueStatus, Long> cfd = issues.stream().collect(Collectors.groupingBy(Issue::getIssueStatus,Collectors.counting()));
+
+        Map<String,Object> response=new HashMap<>();
+        
+        response.put("cfd", cfd);
+        return response;
+
+    }
+
+
+
+
+
+
+
+
 
 
 
