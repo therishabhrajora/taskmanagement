@@ -3,18 +3,24 @@ package com.taskmanagerment.taskmanagement.services;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.netflix.discovery.converters.Auto;
 import com.taskmanagerment.taskmanagement.DTO.IssueDTO;
+import com.taskmanagerment.taskmanagement.client.UserClient;
 import com.taskmanagerment.taskmanagement.entity.Issue;
 import com.taskmanagerment.taskmanagement.entity.IssueComment;
 import com.taskmanagerment.taskmanagement.enums.IssuePriority;
 import com.taskmanagerment.taskmanagement.enums.IssueStatus;
 import com.taskmanagerment.taskmanagement.enums.IssueTypes;
+import com.taskmanagerment.taskmanagement.enums.Role;
 import com.taskmanagerment.taskmanagement.repositpory.EpicRepo;
 import com.taskmanagerment.taskmanagement.repositpory.IssueCommentRepo;
 import com.taskmanagerment.taskmanagement.repositpory.IssueRepo;
@@ -35,6 +41,14 @@ public class IssueService {
 
     @Autowired
     private EpicRepo epicRepo;
+
+    @Autowired
+    private WorkFlowService workFlowService; 
+
+    @Autowired 
+    private UserClient userClient;
+
+
 
     private String generatedKey(Long id) {
         return "PROJECT-" + id;
@@ -81,20 +95,37 @@ public class IssueService {
     @Transactional
     public IssueDTO updateIssueStatus(Long id, IssueStatus status, String performBy) {
         Issue issue = issueRepo.findById(id).orElseThrow(() -> new RuntimeException("Issue not found"));
-        IssueStatus newStatus;
-        try {
-            newStatus = IssueStatus.valueOf(String.valueOf(status).toLowerCase());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update issue status: " + status);
+        // IssueStatus newStatus;
+        // try {
+        //     newStatus = IssueStatus.valueOf(String.valueOf(status).toLowerCase());
+        // } catch (Exception e) {
+        //     throw new RuntimeException("Failed to update issue status: " + status);
+        // }
+
+        String from=issue.getIssueStatus().name();
+        String to=status.name();
+
+        Long workFlowId=issue.getWorkFlowId();
+
+        if(workFlowId==null){
+            throw new RuntimeException("Workflow not defined for this issue");
         }
 
-        issue.setIssueStatus(newStatus);
+        Set<Role> allowedRoles = userClient.getRole(performBy);
+
+        boolean allowed=workFlowService.isTransactionAllowed(workFlowId, from, to, allowedRoles);
+
+        if(!allowed){
+            throw new RuntimeException("You are not allowed to change status from "+from+" to "+to);
+        }
+
+        issue.setIssueStatus(status);
         issueRepo.save(issue);
 
         IssueComment comment = new IssueComment();
         comment.setIssueId(issue.getId());
         comment.setAuthorEmail(performBy);
-        comment.setBody("Issue status changed to " + newStatus);
+        comment.setBody("Issue status changed to " + status);
         issueCommentRepo.save(comment);
 
         return toDTO(issue);

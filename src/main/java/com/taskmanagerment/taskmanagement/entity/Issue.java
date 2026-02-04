@@ -62,6 +62,9 @@ public class Issue {
     private Long sourceIssueId;
     private Integer backLogPosition;
 
+    private Long workFlowId;
+    
+
     
     
 

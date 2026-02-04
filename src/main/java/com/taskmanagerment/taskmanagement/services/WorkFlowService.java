@@ -75,7 +75,7 @@ public class WorkFlowService {
             return workFlowTransactionRepo.findByWorkFlowIdAndFromStatus(workFlowId, fromStatus);
       }
 
-      public boolean isTransactionAllowed(Long workFlowId, String fromStatus,String toStatus, Set<String> userRole){
+      public boolean isTransactionAllowed(Long workFlowId, String fromStatus,String toStatus, Set<Role> userRole){
              List<WorkFlowTransaction> list=workFlowTransactionRepo.findByWorkFlowIdAndFromStatus(workFlowId, fromStatus);
              for(WorkFlowTransaction trans:list){
                   if(trans.getToStatus().equals(list)){
@@ -84,7 +84,7 @@ public class WorkFlowService {
                               return true;
                         }
                         Set<String> allowedSet=Arrays.stream(allowed.split(",")).map(String::trim).collect(Collectors.toSet());
-                        for(String r:userRole) if(allowedSet.contains(r)) return true;
+                        for(Role r:userRole) if(allowedSet.contains(r)) return true;
                         return false;
                   }
 

@@ -2,6 +2,9 @@ package com.taskmanagerment.taskmanagement.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.management.relation.Role;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -60,8 +63,8 @@ public class WorkFlowController {
     @GetMapping("/{id}/transaction/{from}")
     public ResponseEntity<List<WorkFlowTransaction>> allowed(@PathVariable Long id, @PathVariable String fromStatus) {
         return ResponseEntity.ok(workFlowService.allowedTransactions(id, fromStatus));
-    }
     
+    }
 
 
 
