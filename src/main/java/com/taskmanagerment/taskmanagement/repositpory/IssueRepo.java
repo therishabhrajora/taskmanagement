@@ -10,11 +10,16 @@ import com.taskmanagerment.taskmanagement.entity.Issue;
 import com.taskmanagerment.taskmanagement.enums.IssueStatus;
 
 @Repository
-public interface IssueRepo extends JpaRepository<Issue,Long> {
+public interface IssueRepo extends JpaRepository<Issue, Long> {
     Optional<Issue> findByIssueKey(String issueKey);
+
     List<Issue> findBySprintId(Long sprintId);
+
     List<Issue> findByAssigneeEmail(String assigneeEmail);
+
     List<Issue> findByIssueStatus(IssueStatus issueStatus);
-    List<Issue> findByByProjectAndSprintIdIsNullOrderByBackLogPosition(Long projectId);
+
+    List<Issue> findByProjectIdAndSprintIdIsNullOrderByBackLogPosition(Long projectId);
+
     List<Issue> findByEpicId(Long epicId);
 }

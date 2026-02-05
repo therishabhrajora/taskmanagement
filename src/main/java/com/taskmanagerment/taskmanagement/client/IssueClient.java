@@ -8,20 +8,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.taskmanagerment.taskmanagement.enums.IssueStatus;
 
-@FeignClient(name = "issue-service", url = "${ issue.service.url }")
+@FeignClient(
+        name = "issue-service",
+        url = "${issue.service.url}"
+)
 public interface IssueClient {
 
     @PutMapping("/api/issues/{id}/status")
-    public void updateIssueStatus(@PathVariable Long id,
-            @RequestParam IssueStatus status,
-            @RequestParam String performBy);
+    void updateIssueStatus(
+            @PathVariable("id") Long id,
+            @RequestParam("status") IssueStatus status,
+            @RequestParam("performBy") String performBy
+    );
 
     @PostMapping("/api/issues/{id}/comment")
-    public void addCommentToIssue(@PathVariable Long id,
-            @RequestParam String author,
-            @RequestParam String body);
-
-
-    
-
+    void addCommentToIssue(
+            @PathVariable("id") Long id,
+            @RequestParam("author") String author,
+            @RequestParam("body") String body
+    );
 }
+    

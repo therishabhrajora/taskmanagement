@@ -29,10 +29,12 @@ public class BackLogService {
 
     public List<Issue> getBackLog(Long projectId) {
         if (projectId == null) {
-            return issueRepo.findByByProjectAndSprintIdIsNullOrderByBackLogPosition(null);
+            return issueRepo.findByProjectIdAndSprintIdIsNullOrderByBackLogPosition
+(null);
         }
 
-        return issueRepo.findByByProjectAndSprintIdIsNullOrderByBackLogPosition(projectId);
+        return issueRepo.findByProjectIdAndSprintIdIsNullOrderByBackLogPosition
+(projectId);
 
     }
 

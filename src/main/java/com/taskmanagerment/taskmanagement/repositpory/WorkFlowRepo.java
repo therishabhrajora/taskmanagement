@@ -11,7 +11,7 @@ import com.taskmanagerment.taskmanagement.entity.WorkFLow;
 public interface WorkFlowRepo extends JpaRepository<WorkFLow,Long> {
 
    Optional<WorkFLow> findByWorkflowName(String workflowName);
-   Optional<WorkFLow> findByTransactionName(String transactionName); 
+   Optional<WorkFLow> findByTransaction(String transactionName); 
 
     
 
