@@ -12,7 +12,7 @@ COPY taskmanagement/mvnw taskmanagement/pom.xml ./
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
 # 4. Copy the source code and build the application
-COPY taskmanagement/src ./src
+COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Create the final lightweight runtime image
